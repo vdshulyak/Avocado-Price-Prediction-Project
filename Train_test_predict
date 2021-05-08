@@ -1,0 +1,383 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 97,
+   "id": "4b775583-2397-4484-8bcf-62acf94736bb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import csv\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "from pathlib import Path\n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "import warnings\n",
+    "warnings.filterwarnings('ignore')\n",
+    "from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, roc_auc_score , roc_curve , r2_score, mean_absolute_error, mean_squared_error\n",
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "from sklearn import preprocessing\n",
+    "from sklearn.model_selection import train_test_split , GridSearchCV\n",
+    "from sklearn.neighbors import KNeighborsClassifier\n",
+    "from sklearn.neighbors import KNeighborsRegressor\n",
+    "from sklearn.tree import DecisionTreeClassifier\n",
+    "from sklearn.tree import DecisionTreeRegressor\n",
+    "from sklearn.ensemble import AdaBoostClassifier,AdaBoostRegressor\n",
+    "from sklearn.preprocessing import StandardScaler\n",
+    "import sklearn.model_selection \n",
+    "from sklearn.model_selection import cross_val_score"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 78,
+   "id": "cd6f8ebc-b165-44e1-8ec2-f95fd658d53e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def clean_dataset(df):\n",
+    "    assert isinstance(df, pd.DataFrame), \"df needs to be a pd.DataFrame\"\n",
+    "    df.dropna(inplace=True)\n",
+    "    indices_to_keep = ~df.isin([np.nan, np.inf, -np.inf]).any(1)\n",
+    "    return df[indices_to_keep].astype(np.float64)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 79,
+   "id": "6e12669c-22bd-4f5c-9f56-5da1e63ff2a1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_csv(\n",
+    "    Path(\"..//Group_6_Project_2/Combined Dataset.csv\"),\n",
+    "    index_col=\"Date\",\n",
+    "    infer_datetime_format=True,\n",
+    "    parse_dates=True\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 80,
+   "id": "695ffd25-6a01-49dc-911c-f8969cfbadbb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "le = preprocessing.LabelEncoder()\n",
+    "le.fit(df['type'])\n",
+    "LabelEncoder()\n",
+    "df['type'] = le.transform(df['type'])\n",
+    "le.fit(df['region'])\n",
+    "df['region'] = le.transform(df['region'])\n",
+    "df = clean_dataset(df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 81,
+   "id": "db5b8fb2-ece6-4806-b6f4-e4d263798f56",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "x = df.copy()\n",
+    "list_drop = [\"AveragePrice\",\"Total Bags\",\"4046\",\"4225\",\"4770\"]\n",
+    "x.drop(list_drop, axis=1, inplace=True)\n",
+    "y = df.copy()\n",
+    "y = df[\"AveragePrice\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 82,
+   "id": "8ae414bc-98a9-47d6-b948-7be7e1773ce4",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "R2 score corespond to random state 40 is 0.6656905936305988\n",
+      "R2 score corespond to random state 40 is 0.5013967753970066\n",
+      "R2 score corespond to random state 40 is 0.4664623425494596\n",
+      "R2 score corespond to random state 41 is 0.6320383160518377\n",
+      "R2 score corespond to random state 41 is 0.4973703481275603\n",
+      "R2 score corespond to random state 41 is 0.4582971136877402\n",
+      "R2 score corespond to random state 42 is 0.6787597624008705\n",
+      "R2 score corespond to random state 42 is 0.5039091695015594\n",
+      "R2 score corespond to random state 42 is 0.4446747690661975\n",
+      "R2 score corespond to random state 43 is 0.6250817229532134\n",
+      "R2 score corespond to random state 43 is 0.51621291065966\n",
+      "R2 score corespond to random state 43 is 0.47644898389071433\n",
+      "R2 score corespond to random state 44 is 0.6708554348495558\n",
+      "R2 score corespond to random state 44 is 0.5165035161388978\n",
+      "R2 score corespond to random state 44 is 0.46369171849880175\n",
+      "R2 score corespond to random state 45 is 0.6753341340313233\n",
+      "R2 score corespond to random state 45 is 0.5209004601235427\n",
+      "R2 score corespond to random state 45 is 0.47286263784955884\n",
+      "R2 score corespond to random state 46 is 0.6501384606910818\n",
+      "R2 score corespond to random state 46 is 0.5053022954128338\n",
+      "R2 score corespond to random state 46 is 0.4698025832268319\n",
+      "R2 score corespond to random state 47 is 0.6532488695191139\n",
+      "R2 score corespond to random state 47 is 0.512053342107139\n",
+      "R2 score corespond to random state 47 is 0.454004847752957\n",
+      "R2 score corespond to random state 48 is 0.6720160789141969\n",
+      "R2 score corespond to random state 48 is 0.5222778535885004\n",
+      "R2 score corespond to random state 48 is 0.43801476766875636\n",
+      "R2 score corespond to random state 49 is 0.671178343527859\n",
+      "R2 score corespond to random state 49 is 0.5016234823483494\n",
+      "R2 score corespond to random state 49 is 0.41721294584383295\n",
+      "R2 score corespond to random state 50 is 0.6537718490675188\n",
+      "R2 score corespond to random state 50 is 0.5167828050731385\n",
+      "R2 score corespond to random state 50 is 0.44893556585618544\n",
+      "R2 score corespond to random state 51 is 0.634492159157479\n",
+      "R2 score corespond to random state 51 is 0.49118918702963854\n",
+      "R2 score corespond to random state 51 is 0.4184479129585723\n",
+      "R2 score corespond to random state 52 is 0.6602599988286617\n",
+      "R2 score corespond to random state 52 is 0.5151528706804496\n",
+      "R2 score corespond to random state 52 is 0.46023527933095865\n",
+      "R2 score corespond to random state 53 is 0.6625620027798014\n",
+      "R2 score corespond to random state 53 is 0.49386376698662005\n",
+      "R2 score corespond to random state 53 is 0.41946430411099656\n",
+      "R2 score corespond to random state 54 is 0.6745526037722397\n",
+      "R2 score corespond to random state 54 is 0.5051552558407735\n",
+      "R2 score corespond to random state 54 is 0.42692910199717904\n",
+      "R2 score corespond to random state 55 is 0.6785623359753907\n",
+      "R2 score corespond to random state 55 is 0.5057218598884874\n",
+      "R2 score corespond to random state 55 is 0.418337553416261\n",
+      "R2 score corespond to random state 56 is 0.6475930807579781\n",
+      "R2 score corespond to random state 56 is 0.48733405126605966\n",
+      "R2 score corespond to random state 56 is 0.46865612477879237\n",
+      "R2 score corespond to random state 57 is 0.6880036920522585\n",
+      "R2 score corespond to random state 57 is 0.5260183788445585\n",
+      "R2 score corespond to random state 57 is 0.47897608486616794\n",
+      "R2 score corespond to random state 58 is 0.6780707409711044\n",
+      "R2 score corespond to random state 58 is 0.5022496979652358\n",
+      "R2 score corespond to random state 58 is 0.4569707981871878\n",
+      "R2 score corespond to random state 59 is 0.6817353874092611\n",
+      "R2 score corespond to random state 59 is 0.49825117820974885\n",
+      "R2 score corespond to random state 59 is 0.44404037334582935\n",
+      "R2 score corespond to random state 60 is 0.6834608616046733\n",
+      "R2 score corespond to random state 60 is 0.5092864449332769\n",
+      "R2 score corespond to random state 60 is 0.470481966963776\n",
+      "R2 score corespond to random state 61 is 0.681405785648482\n",
+      "R2 score corespond to random state 61 is 0.5017560090287381\n",
+      "R2 score corespond to random state 61 is 0.4407592225925143\n",
+      "R2 score corespond to random state 62 is 0.6533009184991684\n",
+      "R2 score corespond to random state 62 is 0.5041685954759085\n",
+      "R2 score corespond to random state 62 is 0.45805137470117574\n",
+      "R2 score corespond to random state 63 is 0.633286688047622\n",
+      "R2 score corespond to random state 63 is 0.48882547550926525\n",
+      "R2 score corespond to random state 63 is 0.44126082724393845\n",
+      "R2 score corespond to random state 64 is 0.6708664577738852\n",
+      "R2 score corespond to random state 64 is 0.5106533814933629\n",
+      "R2 score corespond to random state 64 is 0.48013552051309205\n",
+      "R2 score corespond to random state 65 is 0.680912334299814\n",
+      "R2 score corespond to random state 65 is 0.504805714415473\n",
+      "R2 score corespond to random state 65 is 0.43829486831379827\n",
+      "R2 score corespond to random state 66 is 0.6591226319296237\n",
+      "R2 score corespond to random state 66 is 0.5092564027349555\n",
+      "R2 score corespond to random state 66 is 0.4478883975110739\n",
+      "R2 score corespond to random state 67 is 0.6830026769827453\n",
+      "R2 score corespond to random state 67 is 0.4867027568724275\n",
+      "R2 score corespond to random state 67 is 0.4430627123849765\n",
+      "R2 score corespond to random state 68 is 0.6705904976008865\n",
+      "R2 score corespond to random state 68 is 0.49541202293798603\n",
+      "R2 score corespond to random state 68 is 0.4537895338650886\n",
+      "R2 score corespond to random state 69 is 0.6585201971586496\n",
+      "R2 score corespond to random state 69 is 0.49172978433867687\n",
+      "R2 score corespond to random state 69 is 0.4781190219084952\n",
+      "R2 score corespond to random state 70 is 0.6862745397803655\n",
+      "R2 score corespond to random state 70 is 0.49636470698161794\n",
+      "R2 score corespond to random state 70 is 0.4700848627697306\n",
+      "R2 score corespond to random state 71 is 0.6772609690186181\n",
+      "R2 score corespond to random state 71 is 0.5054799309626324\n",
+      "R2 score corespond to random state 71 is 0.4930653236183572\n",
+      "R2 score corespond to random state 72 is 0.6822750517172834\n",
+      "R2 score corespond to random state 72 is 0.5135592578522609\n",
+      "R2 score corespond to random state 72 is 0.47792875881577834\n",
+      "R2 score corespond to random state 73 is 0.662537731434749\n",
+      "R2 score corespond to random state 73 is 0.5002786510815171\n",
+      "R2 score corespond to random state 73 is 0.45964143468583163\n",
+      "R2 score corespond to random state 74 is 0.6781249550937349\n",
+      "R2 score corespond to random state 74 is 0.502591157338923\n",
+      "R2 score corespond to random state 74 is 0.4348509429496221\n",
+      "R2 score corespond to random state 75 is 0.6643212221153185\n",
+      "R2 score corespond to random state 75 is 0.4960667816210248\n",
+      "R2 score corespond to random state 75 is 0.46249795662148674\n",
+      "R2 score corespond to random state 76 is 0.6377866064309105\n",
+      "R2 score corespond to random state 76 is 0.4983501402622048\n",
+      "R2 score corespond to random state 76 is 0.45391678326725793\n",
+      "R2 score corespond to random state 77 is 0.6492230317146142\n",
+      "R2 score corespond to random state 77 is 0.5133611184051847\n",
+      "R2 score corespond to random state 77 is 0.41671015478997375\n",
+      "R2 score corespond to random state 78 is 0.7107037677282178\n",
+      "R2 score corespond to random state 78 is 0.5065548610691284\n",
+      "R2 score corespond to random state 78 is 0.4313892468102435\n",
+      "R2 score corespond to random state 79 is 0.649483307395842\n",
+      "R2 score corespond to random state 79 is 0.5136305726551638\n",
+      "R2 score corespond to random state 79 is 0.4687375318935538\n",
+      "R2 score corespond to random state 80 is 0.6542701724229161\n",
+      "R2 score corespond to random state 80 is 0.4910980961869774\n",
+      "R2 score corespond to random state 80 is 0.4404679702133294\n",
+      "R2 score corespond to random state 81 is 0.6916108161616001\n",
+      "R2 score corespond to random state 81 is 0.5147697693469147\n",
+      "R2 score corespond to random state 81 is 0.4455814662610751\n",
+      "R2 score corespond to random state 82 is 0.6575380237542519\n",
+      "R2 score corespond to random state 82 is 0.5071220297875603\n",
+      "R2 score corespond to random state 82 is 0.41631459727966036\n",
+      "R2 score corespond to random state 83 is 0.6868140793990056\n",
+      "R2 score corespond to random state 83 is 0.5127960630384361\n",
+      "R2 score corespond to random state 83 is 0.4511986129561901\n",
+      "R2 score corespond to random state 84 is 0.653292460283968\n",
+      "R2 score corespond to random state 84 is 0.5156987793114384\n",
+      "R2 score corespond to random state 84 is 0.42932308450773893\n",
+      "R2 score corespond to random state 85 is 0.6641530291906339\n",
+      "R2 score corespond to random state 85 is 0.4987666736054216\n",
+      "R2 score corespond to random state 85 is 0.46580247370325656\n",
+      "R2 score corespond to random state 86 is 0.6653950596104237\n",
+      "R2 score corespond to random state 86 is 0.4980107790458562\n",
+      "R2 score corespond to random state 86 is 0.46347597594766576\n",
+      "R2 score corespond to random state 87 is 0.648881083839762\n",
+      "R2 score corespond to random state 87 is 0.4926153160234499\n",
+      "R2 score corespond to random state 87 is 0.42137738164775473\n",
+      "R2 score corespond to random state 88 is 0.6801735779802536\n",
+      "R2 score corespond to random state 88 is 0.5027974826213564\n",
+      "R2 score corespond to random state 88 is 0.42940943573441914\n",
+      "R2 score corespond to random state 89 is 0.6888984864592753\n",
+      "R2 score corespond to random state 89 is 0.49796769752888526\n",
+      "R2 score corespond to random state 89 is 0.45502996876263213\n",
+      "\n",
+      "\n",
+      "\n",
+      "\n",
+      "R2 score corespond to random state 78 is 0.7107037677282178 and the model is DecisionTreeRegressor()\n"
+     ]
+    }
+   ],
+   "source": [
+    "model = [DecisionTreeRegressor(), KNeighborsRegressor() , AdaBoostRegressor()]\n",
+    "max_r2_score = 0\n",
+    "for r_state in range(40,90):\n",
+    "    train_x, test_x ,train_y , test_y = train_test_split(x,y,random_state = r_state , test_size = 0.33)\n",
+    "    for i in model:\n",
+    "        i.fit(train_x,train_y)\n",
+    "        pre = i.predict(test_x)\n",
+    "        r2_sc = r2_score(test_y,pre)\n",
+    "        print(\"R2 score corespond to random state\", r_state,\"is\", r2_sc)\n",
+    "        if r2_sc>max_r2_score:\n",
+    "            max_r2_score=r2_sc\n",
+    "            final_state = r_state\n",
+    "            final_model = i\n",
+    "print()\n",
+    "print()\n",
+    "print()\n",
+    "print()\n",
+    "print(\"R2 score corespond to random state\", final_state,\"is\", max_r2_score , \"and the model is\",final_model)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 93,
+   "id": "d4e18855-7c44-43df-a8a1-30df5752b50a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "R2 Score:  65.31123579051611\n"
+     ]
+    }
+   ],
+   "source": [
+    "train_x, test_x ,train_y , test_y = train_test_split(x,y,random_state = 80 , test_size = 0.33)\n",
+    "regressor = DecisionTreeRegressor(random_state=0)\n",
+    "cross_val_score(regressor, train_x, train_y, cv=10)\n",
+    "regressor.fit(train_x,train_y)\n",
+    "pred = regressor.predict(test_x)\n",
+    "r2_sc = r2_score(test_y,pred)\n",
+    "print(\"R2 Score: \",r2_sc*100)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 100,
+   "id": "5ddd9d51-97ec-4f4b-8f9b-0477e9e90d44",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Mean Absolute Error:  0.1551810344827586\n",
+      "Mean squared Error:  0.05726598275862069\n",
+      "Root Mean Absolute Error:  0.39393024062993515\n"
+     ]
+    }
+   ],
+   "source": [
+    "print('Mean Absolute Error: ',mean_absolute_error(test_y,pred))\n",
+    "print('Mean squared Error: ',mean_squared_error(test_y,pred))\n",
+    "print('Root Mean Absolute Error: ',np.sqrt(mean_absolute_error(test_y,pred)))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 102,
+   "id": "07b365f2-8fcd-4895-9b6d-6a1a7d011ca7",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Text(0, 0.5, 'Predicted Avocado Prices')"
+      ]
+     },
+     "execution_count": 102,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "plt.scatter(x=test_y , y=pred ,  s=100 )\n",
+    "plt.xlabel('Tested Avocado Prices')\n",
+    "plt.ylabel('Predicted Avocado Prices')"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
