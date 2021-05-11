@@ -13,6 +13,8 @@ Team Members: Valeriy Shulyak, Scott Alexander, Joe Vallikalam
 
 Our group will examine avocado prices pre and post pandemic to see the various effects of the pandemic on average prices
 
+
+
 # Project Deliverables:
 1) Understand and visualize trends in avocado prices
 
