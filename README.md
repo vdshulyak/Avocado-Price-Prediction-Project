@@ -12,6 +12,16 @@ Team Members: Valeriy Shulyak, Scott Alexander, Joe Vallikalam
 # Project Overview:
 
 Our group will examine avocado prices pre and post pandemic to see the various effects of the pandemic on average prices
+- Data from Haas Avocado Board Website
+https://hassavocadoboard.com/inside-hab/leadership-meetings-elections/
+
+- Data ranges from 2015 - 2018 and 2021. No data from 2019 , 2020
+
+- We examined avocado prices pre- and post pandemic to see the various effects of pandemic on avocado prices. 
+
+- Hypothesis: Avocado prices are MORE expensive in 2021 due to pandemic
+
+- Our Dataset features are regions, sizes of avocados , growing methods: organic vs conventional
 
 
 
@@ -24,8 +34,14 @@ Our group will examine avocado prices pre and post pandemic to see the various e
 
 
 # Tasks
-1) Create dataset manually
-2) Find websites with avocado prices by region, size of avocados, and growth method: Organic vs conventional
+- Pulled data from Kaggle for 2015-2018
+- Pulled recent data from Hass Avocado Board
+- Unioned the datasets
+- Removed incomplete data records using Python Pandas Library
+- Corrected Datapoint Labeling for Regions
+- Transformed string values into integers using Label Encoder from Sklearn
+- Evaluated three ML models and picked one with higher R2 score
+
 
 
 
